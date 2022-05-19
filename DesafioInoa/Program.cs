@@ -1,19 +1,30 @@
 ﻿using System;
 using System.Globalization;
+using DesafioInoa.utils;
 
 namespace DesafioInoa
 {
     class Program
     {
-        static void Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
 
             (string ticker, float sellPrice, float buyPrice) = parseArgs(args);
 
+            EmailHandler emailHandler = new EmailHandler(ticker, sellPrice, buyPrice);
+            TickerHandler tickerHandler = new TickerHandler(ticker);
+
             Console.WriteLine(ticker);
             Console.WriteLine(sellPrice);
             Console.WriteLine(buyPrice);
+
+            float tickerCurrentPrice = await tickerHandler.getPriceAsync();
+            float tickerCurrentPrice2 = await tickerHandler.getPriceAsync();
+
+            Console.WriteLine(tickerCurrentPrice + "      " + tickerCurrentPrice2);
+
+            return 0;
         }
 
         static Tuple<string, float, float> parseArgs(string[] args)
