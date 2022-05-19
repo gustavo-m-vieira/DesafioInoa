@@ -19,6 +19,8 @@ namespace DesafioInoa.utils
 
 		private void sendMail(string subject, string message)
         {
+			Console.WriteLine(message);
+
 			var settings = ConfigurationManager.AppSettings;
 
 			MailMessage mail = new MailMessage();
