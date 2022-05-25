@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 using System.Net.Mail;
+using System.Net;
 
 namespace DesafioInoa.utils
 {
@@ -23,33 +24,37 @@ namespace DesafioInoa.utils
 
 			var settings = ConfigurationManager.AppSettings;
 
-			MailMessage mail = new MailMessage();
-			mail.From = new MailAddress(settings["from"]);
-			mail.To.Add(settings["to"]);
-			mail.Subject = subject;
-			mail.Body = message;
+			var fromAddress = new MailAddress(settings["from"]);
+			var toAddress = new MailAddress(settings["to"]);
 
-			SmtpClient smtp = generateSmtpClient();
+			SmtpClient smtp = new SmtpClient
+			{
+				Host = settings["smtpClient"],
+				Port = Int32.Parse(settings["smtpPort"]),
+				EnableSsl = true,
+				DeliveryMethod = SmtpDeliveryMethod.Network,
+				UseDefaultCredentials = false,
+				Credentials = new NetworkCredential(fromAddress.Address, settings["password"])
 
-			smtp.Send(mail);
-        }
+			};
 
-		private SmtpClient generateSmtpClient()
-        {
-			var settings = ConfigurationManager.AppSettings;
+			using (var mailMessage = new MailMessage(fromAddress, toAddress)
+			{
+				Subject = subject,
+				Body = message
+			})
+            {
+				smtp.Send(mailMessage);
 
-			SmtpClient smtp = new SmtpClient(settings["smtpClient"]);
-			smtp.Port = int.Parse(settings["smtpPort"]);
-			smtp.Credentials = new System.Net.NetworkCredential(settings["from"], settings["password"]);
-			smtp.EnableSsl = true;
+            };
 
-			return smtp;
+			Console.WriteLine("Email Sent!");
         }
 
 		public void notifyToSell(float currentPrice)
         {
 			string subject = "Alert! Time to sell!";
-			string message = "The ticker" + this.ticker + "has riched the selling point " + this.sellPrice + "! It's price is " + currentPrice;
+			string message = "The ticker " + this.ticker + " has riched the selling point " + this.sellPrice + "! It's price is " + currentPrice;
 
 			sendMail(subject, message);
         }
@@ -57,7 +62,7 @@ namespace DesafioInoa.utils
 		public void notifyToBuy(float currentPrice)
         {
 			string subject = "Alert! Time to buy!";
-			string message = "The ticker" + this.ticker + "has riched the buying point " + this.buyPrice + "! It's price is " + currentPrice;
+			string message = "The ticker " + this.ticker + " has riched the buying point " + this.buyPrice + "! It's price is " + currentPrice;
 
 			sendMail(subject, message);
 		}
