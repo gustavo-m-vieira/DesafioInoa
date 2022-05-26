@@ -30,7 +30,7 @@ namespace DesafioInoa
 
             if (!float.TryParse(args[1], out sellPrice)) throw new ArgumentException("sellPrice must be a float value!");
             if (!float.TryParse(args[2], out buyPrice)) throw new ArgumentException("buyPrice must be a float value!");
-            if (args.Length > 4 && !int.TryParse(args[3], out interval)) throw new ArgumentException("interval must be a int value!");
+            if (args.Length > 3 && !int.TryParse(args[3], out interval)) throw new ArgumentException("interval must be a int value!");
 
             return Tuple.Create(ticker, sellPrice, buyPrice, interval);
         }
