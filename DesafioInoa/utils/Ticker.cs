@@ -24,28 +24,28 @@ namespace DesafioInoa.utils
 
 					ApiResponse apiResponse = JsonConvert.DeserializeObject<ApiResponse>(responseBody);
 
-					if (apiResponse != null && apiResponse.valid_key == true)
-                    {
-						if (lastUpdatedAt != null && apiResponse.results[ticker].updated_at == lastUpdatedAt)
-                        {
-							// Didn't changed, so should not renotify
-							return -1f;
-                        }
+					if (apiResponse != null)
+					{
+						if (apiResponse.valid_key == true)
+						{
+							if (lastUpdatedAt != null && apiResponse.results[ticker].updated_at == lastUpdatedAt)
+							{
+								// Didn't changed, so should not renotify
+								return -1f;
+							}
 
-						lastUpdatedAt = apiResponse.results[ticker].updated_at;
-						return apiResponse.results[ticker].price;
-                    }
-						
-					throw new ArgumentException(invalidTickerErrorMessage);
+							lastUpdatedAt = apiResponse.results[ticker].updated_at;
+							return apiResponse.results[ticker].price;
+						}
+						throw new ArgumentException(invalidTickerErrorMessage);
+					}
+					throw new Exception("Failed Request!");				
 
 				} catch (Exception e)
                 {
-					if (e.Message == invalidTickerErrorMessage)
-                    {
-						// In case ticker is not a valid symbol, program should stop!
-						throw e;
-                    }
-
+					// In case ticker is not a valid symbol, program should stop!
+					if (e.Message == invalidTickerErrorMessage) throw e;
+                   
 					Console.WriteLine("Failed to get price, trying again in 1 minute!");
 
 					return -1f;
